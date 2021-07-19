@@ -1,0 +1,190 @@
+# --------- Глобальные переменные -----------
+
+# Будет хранить данные игровой доски
+board = ["-", "-", "-",
+         "-", "-", "-",
+         "-", "-", "-"]
+
+# Сообщает нам, окончена ли игра
+game_still_going = True
+
+# Сообщает нам, кто победитель
+winner = None
+
+# Сообщает нам, кто текущий игрок (X [ходит] первым)
+current_player = "X"
+
+
+# ------------- Функции ---------------
+print("\n Приветствую! \n Это игра крестики-нолики. \n Победит тот, кто первым соберет строку по вертикали/горизонтали/диагонали.")
+# Играть в крестики-нолики
+def play_game():
+
+  # Показать исходное игровое поле
+  display_board()
+
+  # Зациклить пока игра не остановится (победитель или ничья)
+  while game_still_going:
+
+    # Выполнить ход
+    handle_turn(current_player)
+
+    # Проверить, закончена ли игра
+    check_if_game_over()
+
+    # Перейти к другому игроку
+    flip_player()
+  
+  # Когда игра окончена, вывести победителя или ничью
+  if winner == "X" or winner == "O":
+    print(winner + " победил.")
+  elif winner == None:
+    print("Ничья.")
+
+
+# Отображение игрового поля на экране
+def display_board():
+  print("\n")
+  print(board[0] + " | " + board[1] + " | " + board[2] + "     1 | 2 | 3")
+  print(board[3] + " | " + board[4] + " | " + board[5] + "     4 | 5 | 6")
+  print(board[6] + " | " + board[7] + " | " + board[8] + "     7 | 8 | 9")
+  print("\n")
+
+
+# Выполнить ход для произвольного игрока
+def handle_turn(player):
+
+  # Получить позицию от игрока
+  print(player + ", Ваш ход.")
+  position = input("Выберите позицию от 1 до 9: ")
+
+  # Независимо от того, что вводит пользователь, убедиться, что это правильный ввод, и место открыто
+  valid = False
+  while not valid:
+
+    # Убедиться, что введенные данные действительны
+    while position not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+      position = input("Выберите позицию от 1 до 9: ")
+ 
+    # Получить правильный индекс в списке
+    position = int(position) - 1
+
+    # Затем также убедиться, что место доступно на доске.
+    if board[position] == "-":
+      valid = True
+    else:
+      print("Вы не можете туда пойти. Попробуйте еще раз.")
+
+  # Положить игровую фишку на доску
+  board[position] = player
+
+  # Показать игровое поле
+  display_board()
+
+
+# Проверить, окончена ли игра
+def check_if_game_over():
+  check_for_winner()
+  check_for_tie()
+
+
+# Проверить, выиграл ли кто-нибудь
+def check_for_winner():
+  # Установить глобальные переменные
+  global winner
+  # Проверить, был ли где-нибудь победитель
+  row_winner = check_rows()
+  column_winner = check_columns()
+  diagonal_winner = check_diagonals()
+  # Получить победителя
+  if row_winner:
+    winner = row_winner
+  elif column_winner:
+    winner = column_winner
+  elif diagonal_winner:
+    winner = diagonal_winner
+  else:
+    winner = None
+
+
+# Проверить ряды на победу
+def check_rows():
+  # Установить глобальные переменные
+  global game_still_going
+  # Убедится, что какая-либо из строк имеет одинаковое значение (и не пуста)
+  row_1 = board[0] == board[1] == board[2] != "-"
+  row_2 = board[3] == board[4] == board[5] != "-"
+  row_3 = board[6] == board[7] == board[8] != "-"
+  # Если в какой-либо строке есть совпадение, отметить, что есть выигрыш
+  if row_1 or row_2 or row_3:
+    game_still_going = False
+  # Вернуть победителя
+  if row_1:
+    return board[0] 
+  elif row_2:
+    return board[3] 
+  elif row_3:
+    return board[6] 
+  # Или вернуть None, если победителя не было
+  else:
+    return None
+
+
+# Проверить столбцы на победу
+def check_columns():
+  # Установить глобальные переменные
+  global game_still_going
+  # Проверить, имеет ли какой-либо из столбцов одинаковое значение (и не является ли он пустым)
+  column_1 = board[0] == board[3] == board[6] != "-"
+  column_2 = board[1] == board[4] == board[7] != "-"
+  column_3 = board[2] == board[5] == board[8] != "-"
+  # Если в какой-либо строке есть совпадение, отметить, что есть выигрыш
+  if column_1 or column_2 or column_3:
+    game_still_going = False
+  # Вернуть победителя
+  if column_1:
+    return board[0] 
+  elif column_2:
+    return board[1] 
+  elif column_3:
+    return board[2] 
+  # Или вернуть None, если победителя не было
+  else:
+    return None
+
+
+# Проверить диагонали на победу
+def check_diagonals():
+  # Установить глобальные переменные
+  global game_still_going
+  # Проверить, имеет ли одна из диагоналей одинаковое значение (и не является ли она пустой)
+  diagonal_1 = board[0] == board[4] == board[8] != "-"
+  diagonal_2 = board[2] == board[4] == board[6] != "-"
+  # Если в какой-либо диагонали есть совпадение, отметить, что есть выигрыш
+  if diagonal_1 or diagonal_2:
+    game_still_going = False
+  # Вернуть победителя
+  if diagonal_1:
+    return board[0] 
+  elif diagonal_2:
+    return board[2]
+  # Или вернуть None, если победителя не было
+  else:
+    return None
+
+
+# Проверить есть ли ничья
+def check_for_tie():
+  # Установить глобальные переменные
+  global game_still_going
+  # Если доска заполнена
+  if "-" not in board:
+    game_still_going = False
+    return True
+  # В ином случае - ничьей нет
+  else:
+    return False
+
+# ------------ Начать выполнение -------------
+# Играть в крестики-нолики
+play_game()
